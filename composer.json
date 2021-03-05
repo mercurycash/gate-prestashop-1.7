@@ -1,0 +1,10 @@
+{
+    "name": "2vmodules/prestashop-mercury-cash",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "MercuryCash\\SDK\\": "mercury-cash-sdk/src"
+        }
+    }
+
+}
