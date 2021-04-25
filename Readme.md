@@ -1,5 +1,4 @@
 ## Mercury Payment Prestashop 1.7 module
-======
 
 1. Download module ZIP archive from GitHub.
 2. ZIP archive name should be "**mercurycash**"
