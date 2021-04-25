@@ -29,13 +29,3 @@
  * Maybe the merchant will just try to reset the module
  * but does not want to loose all of the data associated to the module.
  */
-//$sql = array(
-//    'DROP TABLE IF EXISTS
-//      `'. _DB_PREFIX_ .'mercury_cash_transactions`'
-//);
-//
-//foreach ($sql as $query) {
-//    if (Db::getInstance()->execute($query) == false) {
-//        return false;
-//    }
-//}

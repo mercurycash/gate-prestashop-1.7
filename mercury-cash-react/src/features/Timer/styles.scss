@@ -1,0 +1,25 @@
+@import "src/assets/styles/vars";
+
+.mercury-cash__timer {
+  border: 1px solid $purple;
+  box-sizing: border-box;
+  border-radius: 1em;
+  padding: 1em;
+  font-weight: 700;
+  color: $purple;
+  font-size: .75em;
+  min-height: 2.5em;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.75px;
+  margin-bottom: 0.75em;
+  
+  span {
+    margin-left: 0.75em;
+  }
+}
+
+.mercury-cash__timer--uppercase {
+  text-transform: uppercase;
+  justify-content: center;
+}

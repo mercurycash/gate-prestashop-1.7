@@ -27,7 +27,6 @@
 class MercuryCashCheckModuleFrontController extends ModuleFrontController
 {
 
-
     /**
      * This class should be use by your Instant Payment
      * Notification system to validate the order remotely
@@ -40,45 +39,63 @@ class MercuryCashCheckModuleFrontController extends ModuleFrontController
             $adapter = $this->module->isSandbox() ?
                 new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
                 new \MercuryCash\SDK\Adapter($api_key);
+
             $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
             $status_object = $endpoint->status($uuid);
             $status = $status_object->getStatus();
+
+            if (mb_strtoupper($status) === 'TRANSACTION_PENDING') {
+                $confirmations = 0;
+                if ($received_confirmations = $status_object->getConfirmations()) {
+                    $confirmations = $received_confirmations;
+                }
+                die(Tools::jsonEncode([
+                    'data' => [
+                        'status' => $status,
+                        'confirmations' => $confirmations
+                    ]
+                ]));
+            }
+
             if (mb_strtoupper($status) === 'TRANSACTION_RECEIVED') {
-                die(Tools::jsonEncode(['result' => true, 'status' => $status]));
+                $confirmations = 0;
+                if ($received_confirmations = $status_object->getConfirmations()) {
+                    $confirmations = $received_confirmations;
+                }
+                die(Tools::jsonEncode([
+                    'data' => [
+                        'status' => $status,
+                        'confirmations' => $confirmations
+                    ]
+                ]));
             }
+
             if (mb_strtoupper($status) === 'TRANSACTION_APROVED') {
-                $cart_id = Tools::getValue('cart_id');
-                $secure_key = Tools::getValue('secure_key');
-                $cart = new Cart((int) $cart_id);
-                $customer = new Customer((int) $cart->id_customer);
-                $payment_status = Configuration::get('PS_OS_PAYMENT'); // Default value for a payment that succeed.
-                $message = null; // You can add a comment directly into the order so the merchant will see it in the BO.
-                $module_name = $this->module->displayName;
-                $currency_id = (int) Context::getContext()->currency->id;
-
-                if ($secure_key != $customer->secure_key) {
-                    die(Tools::jsonEncode(['result'=> false, 'stop' => true, 'error' => 'Secure error']));
+                $confirmations = 0;
+                if ($received_confirmations = $status_object->getConfirmations()) {
+                    $confirmations = $received_confirmations;
                 }
-
-                $this->module->validateOrder($cart_id, $payment_status, $cart->getOrderTotal(), $module_name, $message, array(), $currency_id, false, $secure_key);
-
-                /**
-                 * The order has been placed so we redirect the customer on the confirmation page.
-                 */
-                $module_id = $this->module->id;
-                $order_id = Order::getOrderByCartId((int) $cart->id);
-                if (!$order_id) {
-                    die(Tools::jsonEncode(['result'=> false, 'stop' => true, 'error' => 'Order creating error']));
-                }
-                $url = Tools::getHttpHost(true).__PS_BASE_URI__.'/index.php?controller=order-confirmation&id_cart='.$cart_id.'&id_module='.$module_id.'&id_order='.$order_id.'&key='.$secure_key;
-                die(Tools::jsonEncode(['result' => true, 'url' => $url, 'status' => $status]));
+                die(Tools::jsonEncode([
+                    'data' => [
+                        'status' => $status,
+                        'confirmations' => $confirmations
+                    ]
+                ]));
             }
-            die(Tools::jsonEncode(['result' => false, 'status' => $status]));
 
+            die(Tools::jsonEncode([
+                'data' => [
+                    'error' => 'Unknown Status',
+                    'status' => $status
+                ]
+            ]));
         } catch (Exception $e) {
-            die(Tools::jsonEncode(['result' => false, 'stop' => true, 'error' => $e->getMessage()]));
+            die(Tools::jsonEncode([
+                'data' => [
+                    'error' => $e->getMessage()
+                ]
+            ]));
         }
     }
-
 
 }

@@ -1,0 +1,110 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Payment/> Render Complete Component 1`] = `
+<div>
+  <h3
+    class="mercury-cash__title mercury-cash__title--big"
+  >
+    amountBePaid
+     0.04230942 ETH
+  </h3>
+  <ul
+    class="mercury-cash__pain-info"
+  >
+    <li>
+      <strong>
+        amountBePaid
+         
+        : 
+      </strong>
+      <span>
+        $50.00 
+      </span>
+    </li>
+    <li>
+      <strong>
+        exchangeRate
+        : 
+      </strong>
+      <span>
+         
+      </span>
+    </li>
+    <li>
+      <strong>
+        total
+        : 
+      </strong>
+      <span>
+         
+      </span>
+    </li>
+  </ul>
+  <h3
+    class="mercury-cash__title mercury-cash__title--small mercury-cash__title--lighter"
+  >
+    address
+    : 
+  </h3>
+  <div
+    class="mercury-cash__qrCode"
+  >
+    <svg
+      height="240"
+      shape-rendering="crispEdges"
+      viewBox="0 0 21 21"
+      width="240"
+    >
+      <path
+        d="M0,0 h21v21H0z"
+        fill="#FFFFFF"
+      />
+      <path
+        d="M0 0h7v1H0zM9 0h1v1H9zM12 0h1v1H12zM14,0 h7v1H14zM0 1h1v1H0zM6 1h1v1H6zM8 1h1v1H8zM11 1h1v1H11zM14 1h1v1H14zM20,1 h1v1H20zM0 2h1v1H0zM2 2h3v1H2zM6 2h1v1H6zM9 2h1v1H9zM14 2h1v1H14zM16 2h3v1H16zM20,2 h1v1H20zM0 3h1v1H0zM2 3h3v1H2zM6 3h1v1H6zM8 3h1v1H8zM11 3h1v1H11zM14 3h1v1H14zM16 3h3v1H16zM20,3 h1v1H20zM0 4h1v1H0zM2 4h3v1H2zM6 4h1v1H6zM10 4h3v1H10zM14 4h1v1H14zM16 4h3v1H16zM20,4 h1v1H20zM0 5h1v1H0zM6 5h1v1H6zM8 5h3v1H8zM12 5h1v1H12zM14 5h1v1H14zM20,5 h1v1H20zM0 6h7v1H0zM8 6h1v1H8zM10 6h1v1H10zM12 6h1v1H12zM14,6 h7v1H14zM10 7h3v1H10zM0 8h5v1H0zM6 8h4v1H6zM12 8h2v1H12zM15 8h1v1H15zM17 8h1v1H17zM19 8h1v1H19zM1 9h2v1H1zM7 9h2v1H7zM10 9h1v1H10zM12 9h1v1H12zM15 9h1v1H15zM18 9h1v1H18zM3 10h1v1H3zM6 10h1v1H6zM8 10h1v1H8zM10 10h2v1H10zM13 10h1v1H13zM16,10 h5v1H16zM0 11h1v1H0zM4 11h1v1H4zM9 11h2v1H9zM15 11h2v1H15zM18 11h1v1H18zM20,11 h1v1H20zM0 12h3v1H0zM5 12h4v1H5zM11 12h1v1H11zM13 12h1v1H13zM16,12 h5v1H16zM8 13h7v1H8zM17 13h1v1H17zM0 14h7v1H0zM8 14h3v1H8zM12 14h1v1H12zM14 14h2v1H14zM0 15h1v1H0zM6 15h1v1H6zM9 15h6v1H9zM17 15h1v1H17zM0 16h1v1H0zM2 16h3v1H2zM6 16h1v1H6zM8 16h3v1H8zM12 16h1v1H12zM15 16h1v1H15zM18 16h1v1H18zM0 17h1v1H0zM2 17h3v1H2zM6 17h1v1H6zM8 17h2v1H8zM12 17h1v1H12zM15 17h1v1H15zM18 17h1v1H18zM0 18h1v1H0zM2 18h3v1H2zM6 18h1v1H6zM8 18h2v1H8zM11 18h1v1H11zM13 18h1v1H13zM16 18h3v1H16zM0 19h1v1H0zM6 19h1v1H6zM8 19h2v1H8zM15 19h2v1H15zM18 19h1v1H18zM0 20h7v1H0zM8 20h1v1H8zM10 20h2v1H10zM13 20h1v1H13zM16 20h4v1H16z"
+        fill="#000000"
+      />
+      <image
+        height="10.0625"
+        preserveAspectRatio="none"
+        width="10.149999999999999"
+        x="5.425"
+        xlink:href="data:image/svg+xml,%3Csvg%3Eqr-logo.svg%3C%2Fsvg%3E"
+        y="5.512499999999999"
+      />
+    </svg>
+  </div>
+  <button
+    class="mercury-cash__btn-reset mercury-cash__toggleQRButton"
+  >
+    showAddress
+  </button>
+  <ul
+    class="mercury-cash__pain-info mercury-cash__pain-info--largest"
+  >
+    <li>
+      <div>
+        <strong>
+          networkCost
+          : 
+        </strong>
+      </div>
+      <div>
+        <span>
+           
+        </span>
+      </div>
+    </li>
+  </ul>
+  <div
+    class="mercury-cash__timer"
+  >
+    expireTransaction
+    : 
+    <span>
+      15
+      :
+      0
+    </span>
+  </div>
+</div>
+`;

@@ -1,0 +1,112 @@
+@import "../../assets/styles/vars";
+
+.mercury-cash-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background-color: rgba(#000, 0.5);
+  font-size: 16px;
+  font-family: $baseFontFamily;
+
+  @media all and (max-width: 768px) {
+    font-size: 14px;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.mercury-cash-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  padding: 0 8px;
+  overflow-y: auto;
+
+  &:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+  }
+}
+
+.mercury-cash-content {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 auto;
+  text-align: left;
+  width: 100%;
+}
+
+.mercury-cash {
+  position: relative;
+  background-color: $modalBg;
+  padding: 6em 4em 4em;
+  border-radius: 2em;
+  font-weight: 400;
+  width: 438px;
+  max-width: calc(100% - 20px);
+  margin: 3em auto;
+
+  @media all and (max-width: 768px) {
+    padding: 4em 2em 2em;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.mercury-cash__top-btn {
+  position: absolute;
+  top: 1.875em;
+}
+
+.mercury-cash__close {
+  right: 2.18em;
+}
+
+.mercury-cash__back {
+  left: 2.18em;
+}
+
+.mercury-cash__subtitle {
+  font-size: 0.875em;
+  line-height: 1.31em;
+  font-weight: 400;
+  text-align: center;
+  color: $titleLighterColor;
+  margin: 0 0 0.75em;
+}
+
+.mercury-cash__text {
+  font-weight: 700;
+  font-size: 0.75em;
+  line-height: 1.3em;
+  letter-spacing: 0.75px;
+  color: $titleColor;
+  text-align: center;
+}
+
+.mercury-cash__text--purple {
+  text-transform: uppercase;
+  color: $purple;
+}
+
+.mercury-cash__gif {
+  max-width: 100%;
+  margin-bottom: 0.75em;
+}
+
+.error {
+  color: $purple;
+  text-align: center;
+}

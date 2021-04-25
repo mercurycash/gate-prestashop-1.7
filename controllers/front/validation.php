@@ -27,15 +27,12 @@
 class MercuryCashValidationModuleFrontController extends ModuleFrontController
 {
 
-
     /**
      * This class should be use by your Instant Payment
      * Notification system to validate the order remotely
      */
     public function postProcess()
     {
-        $log = dirname(__FILE__) . '/debug.log';
-
         /*
          * If the module is not active anymore, no need to process anything.
          */
@@ -55,10 +52,11 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         /*
          * Restore the context from the $cart_id & the $customer_id to process the validation properly.
          */
-        Context::getContext()->cart = new Cart((int) $cart_id);
-        Context::getContext()->customer = new Customer((int) $customer_id);
-        Context::getContext()->currency = new Currency((int) Context::getContext()->cart->id_currency);
-        Context::getContext()->language = new Language((int) Context::getContext()->customer->id_lang);
+        $context = Context::getContext();
+        $context->cart = new Cart((int) $cart_id);
+        $context->customer = new Customer((int) $customer_id);
+        $context->currency = new Currency((int) $context->cart->id_currency);
+        $context->language = new Language((int) $context->customer->id_lang);
 
         //get cart currency
         $currency = new Currency($currency_id);
@@ -70,37 +68,39 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         if ($module_currencies) {
             $module_currencies_array = array_keys($module_currencies);
             if (!in_array($currency_iso, $module_currencies_array)) {
-                die(Tools::jsonEncode(['result'=> false, 'error' => 'Order currency not allowd.']));
+                die(Tools::jsonEncode(['error' => 'Order currency not allowd.']));
             }
         }
 
         //get cart parameters
         $amount = $this->context->cart->getOrderTotal();
-        $crypto_type = Tools::getValue('currency_option');
-        $secure_key = Context::getContext()->customer->secure_key;
+        $crypto_type = Tools::getValue('crypto');
+        $secure_key = $context->customer->secure_key;
+        $this->context->cookie->__set('secure_key', $secure_key);
         $available_crypto_types = ['BTC', 'ETH', 'DASH'];
 
         //check crypto type
         if (!in_array($crypto_type, $available_crypto_types)) {
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Wrong crypto currency type.']));
+            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Wrong crypto currency type.']]));
         }
 
         //check minimum amount for choosen crypto type
         $minimum_amount = $this->module->getMinimumAmount($crypto_type);
         if ($amount < $minimum_amount) {
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Minimum amount with '.$crypto_type.': '.$minimum_amount.'.']));
+            die(Tools::jsonEncode(['data' => ['error' => 'Minimum amount with '.$crypto_type.': '.$minimum_amount.'.']]));
         }
 
         //get module api keys
         $api_key = $this->module->getApiKey();
         if (!$api_key) {
-            die($this->module->l('Wrong API keys'));
+            die(Tools::jsonEncode(['data' => ['error' => 'Wrong API keys']]));
         }
 
         //create transaction
         $adapter = $this->module->isSandbox() ?
             new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
             new \MercuryCash\SDK\Adapter($api_key);
+
         $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
         try {
             $transaction = $endpoint->create([
@@ -112,16 +112,13 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = $e->getResponse();
             $error = $response->getBody()->getContents();
-            error_log(PHP_EOL . 'exception I: '. $error . PHP_EOL, 3, $log);
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+            die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $response = $e->getResponse();
             $error = $response->getBody()->getContents();
-            error_log(PHP_EOL . 'exception II: '. $error . PHP_EOL, 3, $log);
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+            die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
         } catch (Exception $e) {
-            error_log(PHP_EOL . 'exception III: '. $e->getMessage() . PHP_EOL, 3, $log);
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
         }
 
         //get transaction uid;
@@ -133,16 +130,13 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = $e->getResponse();
             $error = $response->getBody()->getContents();
-            error_log(PHP_EOL . 'exception IV: '. $error . PHP_EOL, 3, $log);
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $response = $e->getResponse();
             $error = $response->getBody()->getContents();
-            error_log(PHP_EOL . 'exception V: '. $error . PHP_EOL, 3, $log);
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
         } catch (Exception $e) {
-            error_log(PHP_EOL . 'exception VI: '. $e->getMessage() . PHP_EOL, 3, $log);
-            die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
         }
 
         //get status of transaction
@@ -151,41 +145,48 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
          } catch (\GuzzleHttp\Exception\ClientException $e) {
              $response = $e->getResponse();
              $error = $response->getBody()->getContents();
-             error_log(PHP_EOL . 'exception VII: '. $error . PHP_EOL, 3, $log);
-             die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+             die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
          } catch (\GuzzleHttp\Exception\ServerException $e) {
              $response = $e->getResponse();
              $error = $response->getBody()->getContents();
-             error_log(PHP_EOL . 'exception VIII: '. $error . PHP_EOL, 3, $log);
-             die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+             die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
          } catch (Exception $e) {
-             error_log(PHP_EOL . 'exception IX: '. $e->getMessage() . PHP_EOL, 3, $log);
-             die(Tools::jsonEncode(['result'=> false, 'error' => 'Mercury error. Please, try later.']));
+             die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
          }
 
         $address = $transaction->getAddress();
         $crypto_amount = $transaction->getCryptoAmount();
 
+        switch ($crypto_type) {
+            case 'BTC':
+                $type = 'bitcoin';
+                break;
+            case 'ETH':
+                $type = 'ethereum';
+                break;
+            case 'DASH':
+                $type = 'dash';
+        }
         //get qr-code address
-        $qr = "bitcoin:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
+        $qr = "$type:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
 
         die(Tools::jsonEncode([
-            'result'=> true,
-            'uuid' => $uuid,
-            'address' => $address,
-            'qr' => $qr,
-            'cart_id' => $cart_id,
-            'secure_key' => $secure_key,
-            'crypto_amount' => $crypto_amount,
-            'crypto_type' => $crypto_type,
-            'amount' => $amount,
-            'current_currency' => $currency_iso,
-            'network_coast' => $transaction->getFee(),
-            'exchange_rate' => $transaction->getRate(),
-            'total' => $crypto_amount
+            'data' => [
+                'cryptoAmount' => $crypto_amount,
+                'confirmations' => 5,
+                'address' => $address,
+                'qrCodeText' => $qr,
+                'exchangeRate' => $transaction->getRate(),
+                'networkFee' => $transaction->getFee(),
+                'uuid' => $uuid,
+                'cryptoCurrency' => $crypto_type
+            ]
         ]));
     }
 
+    /**
+     * @return bool
+     */
     protected function isValidOrder()
     {
         /*

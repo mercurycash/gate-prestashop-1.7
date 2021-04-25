@@ -25,6 +25,11 @@
 */
 class MercuryCashConfirmationModuleFrontController extends ModuleFrontController
 {
+
+    /**
+     * @throws \Exception
+     * @throws \PrestaShopException
+     */
     public function postProcess()
     {
 
@@ -72,4 +77,5 @@ class MercuryCashConfirmationModuleFrontController extends ModuleFrontController
             return $this->setTemplate('error.tpl');
         }
     }
+
 }

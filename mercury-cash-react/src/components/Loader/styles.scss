@@ -1,0 +1,20 @@
+.mercury-cash__loader {
+  text-align: center;
+  animation: fadeToggle 1s infinite;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeToggle {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

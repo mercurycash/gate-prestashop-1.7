@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<PaymentReceived/> Payment component render and set checkout data in state 1`] = `
+<div>
+  <h3
+    class="mercury-cash__title mercury-cash__title--big"
+  >
+    received
+  </h3>
+  <h4
+    class="mercury-cash__text mercury-cash__text--purple"
+  >
+    dontCloseWindow
+  </h4>
+  <img
+    alt=""
+    class="mercury-cash__gif"
+    src="preloader.gif"
+  />
+  <div
+    class="mercury-cash__timer mercury-cash__timer--uppercase"
+  >
+    confirmations
+    : 
+  </div>
+  <h4
+    class="mercury-cash__text "
+  >
+    pleaseWaitConfirmation
+  </h4>
+</div>
+`;

@@ -24,6 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+require_once('vendor/autoload.php');
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 
@@ -31,13 +32,14 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-
 class MercuryCash extends PaymentModule
 {
 
-
     protected $config_form = false;
 
+    /**
+     * MercuryCash constructor.
+     */
     public function __construct()
     {
         $this->name = 'mercurycash';
@@ -58,7 +60,7 @@ class MercuryCash extends PaymentModule
         $this->displayName = $this->l('Mercury Cash');
         $this->description = $this->l('Module For Mercury Cash payments');
 
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
     }
 
     /**
@@ -70,6 +72,7 @@ class MercuryCash extends PaymentModule
 
         include(dirname(__FILE__).'/sql/install.php');
 
+        Configuration::updateValue('MERCURYCASH_STATUS_PERIOD', 5);
         Configuration::updateValue('MERCURYCASH_BITCOIN_MIN', 40);
         Configuration::updateValue('MERCURYCASH_ETHEREUM_MIN', 5);
         Configuration::updateValue('MERCURYCASH_DASH_MIN', 2);
@@ -149,6 +152,13 @@ class MercuryCash extends PaymentModule
                 'icon' => 'icon-cogs',
                 ),
                 'input' => array(
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
+                        'desc' => $this->l('Status refresh period (seconds)'),
+                        'name' => 'MERCURYCASH_STATUS_PERIOD',
+                        'label' => $this->l('Status refresh period (seconds)'),
+                    ),
                     array(
                         'col' => 3,
                         'type' => 'text',
@@ -232,6 +242,7 @@ class MercuryCash extends PaymentModule
     protected function getConfigFormValues()
     {
         return array(
+            'MERCURYCASH_STATUS_PERIOD'       => Configuration::get('MERCURYCASH_STATUS_PERIOD', null, null, null, 5),
             'MERCURYCASH_PUBLIC_KEY'          => Configuration::get('MERCURYCASH_PUBLIC_KEY'),
             'MERCURYCASH_PRIVATE_KEY'         => Configuration::get('MERCURYCASH_PRIVATE_KEY'),
             'MERCURYCASH_PUBLIC_KEY_SANDBOX'  => Configuration::get('MERCURYCASH_PUBLIC_KEY_SANDBOX'),
@@ -250,25 +261,35 @@ class MercuryCash extends PaymentModule
     protected function postProcess()
     {
         $form_values = $this->getConfigFormValues();
-        $credentials_error = false;
-        $sandbox_credentials_error = false;
+        $credentials_error = $sandbox_credentials_error = $period_error = false;
 
-        $public_key = Tools::getValue('MERCURYCASH_PUBLIC_KEY');
+        $public_key  = Tools::getValue('MERCURYCASH_PUBLIC_KEY');
         $private_key = Tools::getValue('MERCURYCASH_PRIVATE_KEY');
+        $sandbox     = Tools::getValue('MERCURYCASH_SANDBOX');
+        $period      = Tools::getValue('MERCURYCASH_STATUS_PERIOD');
 
-        $sandbox = Tools::getValue('MERCURYCASH_SANDBOX');
+        $this->context->controller->errors = [];
+        $this->context->controller->confirmations = [];
 
+        if (!is_numeric($period) || $period < 1 || $period > 15) {
+            $period_error = true;
+        }
         try {
             if (!$public_key || !$private_key) {
                 throw new Exception('wrong credentials');
             }
             $api_key = $this->getApiKey($public_key, $private_key);
-            $adapter = $this->isSandbox() ?
-                new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
-                new \MercuryCash\SDK\Adapter($api_key);
+            $adapter = new \MercuryCash\SDK\Adapter($api_key);
             $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
-            $endpoint->status(1);
-            $this->context->controller->errors = [];
+            $endpoint->status('test');
+            $this->context->controller->confirmations[] = 'Mercury credentials were verified';
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if (strpos($e->getMessage(), '[status code] 424') === false) {
+                $this->context->controller->confirmations[] = 'Mercury credentials were verified';
+            } else {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials';
+            }
+            $this->context->controller->errors[] = $e->getMessage();
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $response = $e->getResponse();
             if ($response->getStatusCode() == 500) {
@@ -285,21 +306,24 @@ class MercuryCash extends PaymentModule
             $credentials_error = true;
             $this->context->controller->errors[] = 'Wrong Mercury credentials';
         }
+
         if ($sandbox) {
             $public_key = Tools::getValue('MERCURYCASH_PUBLIC_KEY_SANDBOX');
             $private_key = Tools::getValue('MERCURYCASH_PRIVATE_KEY_SANDBOX');
-
             try {
                 if (!$public_key || !$private_key) {
                     throw new Exception('wrong credentials');
                 }
                 $api_key = $this->getApiKey($public_key, $private_key);
-                $adapter = $this->isSandbox() ?
-                    new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
-                    new \MercuryCash\SDK\Adapter($api_key);
+                $adapter = new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk');
                 $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
-                $endpoint->status(1);
-                $this->context->controller->errors = [];
+                $endpoint->status('test');
+            } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+                if (strpos($e->getMessage(), '[status code] 424') === false) {
+                    $this->context->controller->confirmations[] = 'Mercury credentials for Sandbox were verified';
+                } else {
+                    $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+                }
             } catch (\GuzzleHttp\Exception\ServerException $e) {
                 $response = $e->getResponse();
                 if ($response->getStatusCode() == 500) {
@@ -318,23 +342,20 @@ class MercuryCash extends PaymentModule
             }
         }
 
+        if ($period_error) {
+            $this->context->controller->errors[] = 'Wrong Period value';
+        }
+
         foreach (array_keys($form_values) as $key) {
             $value = Tools::getValue($key);
-            if ($credentials_error) {
-                if ($key == 'MERCURYCASH_PUBLIC_KEY') {
-                    $value = null;
-                }
-                if ($key == 'MERCURYCASH_PRIVATE_KEY') {
-                    $value = null;
-                }
+            if ($credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY' || $key === 'MERCURYCASH_PRIVATE_KEY')) {
+                $value = null;
             }
-            if ($sandbox_credentials_error) {
-                if ($key == 'MERCURYCASH_PUBLIC_KEY_SANDBOX') {
-                    $value = null;
-                }
-                if ($key == 'MERCURYCASH_PRIVATE_KEY_SANDBOX') {
-                    $value = null;
-                }
+            if ($sandbox_credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY_SANDBOX' || $key === 'MERCURYCASH_PRIVATE_KEY_SANDBOX')) {
+                $value = null;
+            }
+            if ($period_error && $key === 'MERCURYCASH_STATUS_PERIOD') {
+                $value = 5;
             }
             Configuration::updateValue($key, $value);
         }
@@ -361,6 +382,8 @@ class MercuryCash extends PaymentModule
     {
         $this->context->controller->addJS($this->_path.'/views/js/kjua.min.js');
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
+        $this->context->controller->addJS($this->_path.'/mercury-cash-react/build/static/js/main.63920eb4.js');
+        $this->context->controller->addCSS($this->_path.'/mercury-cash-react/build/static/css/main.5b50619d.css');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
@@ -371,12 +394,15 @@ class MercuryCash extends PaymentModule
      * @param array Hook parameters
      *
      * @return array|null
+     * @throws \Exception
      */
     public function hookPaymentOptions($params)
     {
-        $currencies_check = false;
+        $currencies_check = $check_minimum_amount = false;
         $module_currencies = $this->getAvailableCurrencies();
+
         if ($module_currencies) {
+
             $module_currencies_array = array_keys($module_currencies);
             $currencies = CurrencyCore::getCurrencies();
 
@@ -389,27 +415,25 @@ class MercuryCash extends PaymentModule
             }
         }
 
-        if (!$this->active || !$currencies_check) {
-            return;
-        }
-
-        if (!$this->checkCurrency($params['cart'])) {
+        if (!$this->active || !$currencies_check || !$this->checkCurrency($params['cart'])) {
             return;
         }
 
         $minimum_amount_array = $this->getMinimumAmountArray();
         $amount = $this->context->cart->getOrderTotal();
+
         foreach ($minimum_amount_array as $minimum_amount) {
-            if ($amount < $minimum_amount) {
-                return;
+            if ($amount >= $minimum_amount) {
+                $check_minimum_amount = true;
+                break;
             }
         }
-
-        $option = [
+        if (!$check_minimum_amount) {
+            return;
+        }
+        return [
             $this->getEmbeddedPaymentOption(),
         ];
-
-        return $option;
     }
 
     /**
@@ -424,19 +448,36 @@ class MercuryCash extends PaymentModule
         return $embeddedOption;
     }
 
+    /**
+     * @return mixed
+     */
     protected function generateForm()
     {
-        $process_url = $this->context->link->getModuleLink($this->name, 'validation', array('ajax' => true));
-        $status_url = $this->context->link->getModuleLink($this->name, 'check', array('ajax' => true));
+        $process_url  = $this->context->link->getModuleLink($this->name, 'validation', array('ajax' => true));
+        $status_url   = $this->context->link->getModuleLink($this->name, 'check',      array('ajax' => true));
+        $settings_url = $this->context->link->getModuleLink($this->name, 'settings',   array('ajax' => true));
+        $success_url  = $this->context->link->getModuleLink($this->name, 'success',    array('ajax' => true));
+
+        $refresh_period = Configuration::get('MERCURYCASH_STATUS_PERIOD', null, null, null, 5);
+
         $this->context->smarty->assign([
+            'get_settings_url' => $settings_url,
+            'success_url' => $success_url,
             'action' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
             'url' => $process_url,
-            'status_url' => $status_url
+            'status_url' => $status_url,
+            'refresh_period' => $refresh_period
         ]);
 
         return $this->context->smarty->fetch('module:mercurycash/views/templates/front/payment_form.tpl');
     }
 
+
+    /**
+     * @param $cart
+     *
+     * @return bool
+     */
     public function checkCurrency($cart)
     {
         $currency_order = new Currency($cart->id_currency);
@@ -450,6 +491,7 @@ class MercuryCash extends PaymentModule
         }
         return false;
     }
+
 
     /**
      * @param $type
@@ -521,12 +563,11 @@ class MercuryCash extends PaymentModule
      */
     public function getApiKey($public_key_ = null, $private_key_ = null)
     {
-        $public_key = $public_key_ ? $public_key_ : $this->getPublicKey();
+        $public_key  = $public_key_  ? $public_key_  : $this->getPublicKey();
         $private_key = $private_key_ ? $private_key_ : $this->getPrivateKey();
-        if (!$public_key || !$private_key) {
-            return null;
-        }
-        return new \MercuryCash\SDK\Auth\APIKey($public_key, $private_key);
+
+        return $public_key && $private_key ?
+            new \MercuryCash\SDK\Auth\APIKey($public_key, $private_key) : null;
     }
 
 

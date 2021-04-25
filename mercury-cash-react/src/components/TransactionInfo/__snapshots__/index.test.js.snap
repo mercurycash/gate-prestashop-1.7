@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<WalletAddress/> Render Loader Component 1`] = `
+<div>
+  <ul
+    class="mercury-cash__pain-info"
+  >
+    <li>
+      <strong>
+        Amount to be Paid USD:
+      </strong>
+       
+      <span>
+        $50.00 USD
+      </span>
+    </li>
+    <li>
+      <strong>
+        Exchange rate:
+      </strong>
+       
+      <span>
+        1,182.77 USD
+      </span>
+    </li>
+    <li>
+      <strong>
+        Total:
+      </strong>
+       
+      <span>
+        0.04230942 ETH
+      </span>
+    </li>
+  </ul>
+</div>
+`;

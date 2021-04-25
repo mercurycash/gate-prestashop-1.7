@@ -52,6 +52,11 @@ class Status implements ResponseInterface
     protected $status = null;
 
     /**
+     * @var string
+     */
+    protected $confirmations = null;
+
+    /**
      * @return string
      */
     public function getUuid(): string
@@ -204,4 +209,25 @@ class Status implements ResponseInterface
         
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getConfirmations(): string
+    {
+        return $this->confirmations;
+    }
+
+    /**
+     * @param string $confirmations
+     *
+     * @return \MercuryCash\SDK\Responses\Status
+     */
+    public function setConfirmations(string $confirmations): Status
+    {
+        $this->confirmations = $confirmations;
+
+        return $this;
+    }
+
 }

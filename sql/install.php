@@ -23,20 +23,3 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-//$sql = array();
-//
-//$sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'mercury_cash_transactions` (
-//    `id` int(11) NOT NULL AUTO_INCREMENT,
-//    `id_customer` int(11) NOT NULL,
-//    `id_order` int(11) NOT NULL,
-//    `transaction_uuid` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-//    `crypto_amount` varchar(100) NOT NULL,
-//    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
-//    PRIMARY KEY  (`id`)
-//) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
-//
-//foreach ($sql as $query) {
-//    if (Db::getInstance()->execute($query) == false) {
-//        return false;
-//    }
-//}

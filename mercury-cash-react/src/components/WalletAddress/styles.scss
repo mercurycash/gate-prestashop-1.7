@@ -1,0 +1,25 @@
+@import "../../assets/styles/vars";
+
+.mercury-cash__wallet-address {
+  display: flex;
+  align-items: center;
+  padding: 0.65em 0.96em 0.65em 1.5em;
+  background-color: $walletBg;
+  border: 1px solid $walletBg;
+  border-radius: 1em;
+  margin-bottom: 0.75em;
+  
+  span {
+    flex: 1 1 auto;
+    word-break: break-all;
+    margin-right: 1.2em;
+    font-size: 0.75em;
+    line-height: 1.31em;
+    color: $titleLighterColor;
+    font-weight: 400;
+  }
+  
+  button {
+    flex: 0 0 auto;
+  }
+}

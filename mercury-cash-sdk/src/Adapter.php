@@ -98,7 +98,6 @@ class Adapter implements AdapterInterface
      */
     public function request(string $method, string $uri, RequestInterface $request = null, array $headers = []): ResponseInterface
     {
-        $log = dirname(__FILE__) . '/debug.log';
 
         if (!in_array($method, $this->methods)) {
             throw new \InvalidArgumentException('Request method must be get, post, put, patch, or delete');

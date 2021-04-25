@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SelectCurrency/> should render component and create snapshot 1`] = `
+<div>
+  <h3
+    class="mercury-cash__title mercury-cash__title--big"
+  >
+    payWithCryptoCurrency
+  </h3>
+  <h4
+    class="mercury-cash__subtitle"
+  >
+    selectCrypto
+  </h4>
+  <button
+    class="mercury-cash__btn-reset mercury-cash__btn-crypto"
+  >
+    Bitcoin
+    <svg>
+      icon-btc.svg
+    </svg>
+  </button>
+  <button
+    class="mercury-cash__btn-reset mercury-cash__btn-crypto"
+  >
+    Ethereum
+    <svg>
+      icon-eth.svg
+    </svg>
+  </button>
+  <button
+    class="mercury-cash__btn-reset mercury-cash__btn-crypto"
+  >
+    Dash
+    <svg>
+      icon-dash.svg
+    </svg>
+  </button>
+</div>
+`;
