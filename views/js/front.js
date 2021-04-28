@@ -38,7 +38,7 @@ $(document).ready(function () {
                     });
                     sdk.checkout(price, currency, email);
                     sdk.on('close', (obj) => {
-                        if(obj.status && (obj.status === 'TRANSACTION_APROVED' || obj.status === 'TRANSACTION_RECEIVED')) {
+                        if(obj.status && obj.status === 'TRANSACTION_APROVED') {
                             $('body').addClass('loading');
                             $.ajax({
                                 ajax: 1,
