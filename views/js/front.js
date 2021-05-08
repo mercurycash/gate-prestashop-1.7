@@ -1,15 +1,15 @@
 $(document).ready(function () {
 
     $("#payment-confirmation button").on("click", function(e) {
-        if ($('input[name="payment-option"]:checked').attr("data-module-name") === "mercury_cash") {
+        if ($("input[name='payment-option']:checked").attr("data-module-name") === "mercury_cash") {
             e.preventDefault();
             $("body").prepend('<div id="mercury-cash"></div>');
 
-            var url              = $('input[name="url"]').val();
-            var status_url       = $('input[name="status_url"]').val();
-            var get_settings_url = $('input[name="get_settings_url"]').val();
-            var success_url      = $('input[name="success_url"]').val();
-            var refresh_period   = $('input[name="refresh_period"]').val() * 1000;
+            var url              = $("input[name='url']").val();
+            var status_url       = $("input[name='status_url']").val();
+            var get_settings_url = $("input[name='get_settings_url']").val();
+            var success_url      = $("input[name='success_url']").val();
+            var refresh_period   = $("input[name='refresh_period']").val() * 1000;
 
             $.ajax({
                 ajax: 1,
