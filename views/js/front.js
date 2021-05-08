@@ -6,34 +6,34 @@ $(document).ready(function () {
             $("body").prepend('<div id="mercury-cash"></div>');
 
             var url              = $("input[name='url']").val();
-            var status_url       = $("input[name='status_url']").val();
-            var get_settings_url = $("input[name='get_settings_url']").val();
-            var success_url      = $("input[name='success_url']").val();
-            var refresh_period   = $("input[name='refresh_period']").val() * 1000;
+            var statusUrl       = $("input[name='status_url']").val();
+            var getSettingsUrl = $("input[name='get_settings_url']").val();
+            var successUrl      = $("input[name='success_url']").val();
+            var refreshPeriod   = $("input[name='refresh_period']").val() * 1000;
 
             $.ajax({
                 ajax: 1,
-                url: get_settings_url,
+                url: getSettingsUrl,
                 type: "post",
                 dataType: "json",
                 success(data) {
-                    var price        = data.price;
-                    var currency     = data.currency;
-                    var minimum_btc  = data.minimum_btc;
-                    var minimum_eth  = data.minimum_eth;
-                    var minimum_dash = data.minimum_dash;
-                    var email        = data.email;
+                    var price       = data.price;
+                    var currency    = data.currency;
+                    var minimumBtc  = data.minimum_btc;
+                    var minimumEth  = data.minimum_eth;
+                    var minimumDash = data.minimum_dash;
+                    var email       = data.email;
 
                     var sdk = new MercurySDK({
                         checkoutUrl: url,
-                        statusUrl: status_url,
-                        checkStatusInterval: refresh_period,
+                        statusUrl: statusUrl,
+                        checkStatusInterval: refreshPeriod,
                         mount: "#mercury-cash",
                         lang: "en",
                         limits: {
-                            BTC:  minimum_btc,
-                            ETH:  minimum_eth,
-                            DASH: minimum_dash
+                            BTC:  minimumBtc,
+                            ETH:  minimumEth,
+                            DASH: minimumDash
                         }
                     });
                     sdk.checkout(price, currency, email);
@@ -42,7 +42,7 @@ $(document).ready(function () {
                             $("body").addClass("loading");
                             $.ajax({
                                 ajax: 1,
-                                url: success_url,
+                                url: successUrl,
                                 type: "post",
                                 dataType: "json",
                                 success(data) {
