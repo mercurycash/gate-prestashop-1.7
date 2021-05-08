@@ -3,7 +3,7 @@
 class MercuryCashValidationModuleFrontController extends ModuleFrontController
 {
 
-    private $available_crypto_types = ['BTC', 'ETH', 'DASH'];
+    private $available_types = ['BTC', 'ETH', 'DASH'];
 
     /**
      * This class should be use by your Instant Payment
@@ -14,7 +14,8 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         /*
          * If the module is not active anymore, no need to process anything.
          */
-        if ($this->module->active == false) die;
+        if ($this->module->active == false)
+            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Module not active.']]));
 
         /**
          * Since it is an example, we choose sample data,
@@ -48,7 +49,7 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         $this->context->cookie->__set('secure_key', $secure_key);
 
         //check crypto type
-        if (!in_array($crypto_type, $this->available_crypto_types)) {
+        if (!in_array($crypto_type, $this->available_types)) {
             die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Wrong crypto currency type.']]));
         }
 
@@ -168,16 +169,24 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
     }
 
     /**
-     * @param \GuzzleHttp\Exception\BadResponseException $e
+     * @param \GuzzleHttp\Exception\BadResponseException $exception
      *
      * @return string
      */
-    private function getError(\GuzzleHttp\Exception\BadResponseException $e)
+    private function getError(\GuzzleHttp\Exception\BadResponseException $exception)
     {
-        $response = $e->getResponse();
+        $response = $exception->getResponse();
         return $response->getBody()->getContents();
     }
 
+    /**
+     * @param $endpoint
+     * @param $crypto_type
+     * @param $currency_iso
+     * @param $amount
+     *
+     * @return bool
+     */
     private function getTransaction($endpoint, $crypto_type, $currency_iso, $amount)
     {
         try {
@@ -188,11 +197,11 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
                 'tip' => 0,
             ]);
             return $transaction;
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $error = $this->getError($e);
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $error = $this->getError($e);
-        } catch (Exception $e) {
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+            $this->getError($exception);
+        } catch (\GuzzleHttp\Exception\ServerException $exception) {
+            $this->getError($exception);
+        } catch (Exception $exception) {
         }
         return false;
     }
@@ -209,11 +218,11 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         try {
             $checkout = $endpoint->process($uuid);
             return $checkout;
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $error = $this->getError($e);
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $error = $this->getError($e);
-        } catch (Exception $e) {
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+            $this->getError($exception);
+        } catch (\GuzzleHttp\Exception\ServerException $exception) {
+            $this->getError($exception);
+        } catch (Exception $exception) {
         }
         return false;
     }
@@ -230,11 +239,11 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         try {
             $status = $endpoint->status($uuid);
             return $status;
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $error = $this->getError($e);
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $error = $this->getError($e);
-        } catch (Exception $e) {
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+            $this->getError($exception);
+        } catch (\GuzzleHttp\Exception\ServerException $exception) {
+            $this->getError($exception);
+        } catch (Exception $exception) {
         }
         return false;
     }
