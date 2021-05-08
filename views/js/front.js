@@ -45,7 +45,7 @@ $(document).ready(function () {
                                 url: success_url,
                                 type: 'post',
                                 dataType: 'json',
-                                success: function(data) {
+                                success(data) {
                                     $('body').removeClass('loading');
                                     if (data.result == true) {
                                         var url = data.url;
@@ -56,7 +56,7 @@ $(document).ready(function () {
                                         $('#errorModal').modal('toggle');
                                     }
                                 },
-                                error: function (jqXHR, exception) {
+                                error(jqXHR, exception) {
                                     $('body').removeClass('loading');
                                     var msg = '';
                                     if (jqXHR.status === 0) {
