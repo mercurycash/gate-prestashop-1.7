@@ -76,7 +76,7 @@ var sdk = new MercurySDK({
 *  `lang` - принимает текст языка в виде `en` или тот язык клиента который делает заказ. Если указанный язык не найдет,
   то язык автоматом поменяется на Английский
 
-###  Запрос на `checkoutUrl`
+### Запрос на `checkoutUrl`
 
 `checkoutUrl` на которого будет отправляться post запрос с параметрами: `price` цена, `crypto` криптовалюта который
 выбрал клиент, `currency` валюта клиента на котором он хочет оплатить и `email`. Запрос будет отправляться после выбора
@@ -93,7 +93,7 @@ var sdk = new MercurySDK({
 -  `uuid`
 -  `cryptoCurrency`
 
-###  Запрос на `statusUrl`
+### Запрос на `statusUrl`
 
 Будет отправлять post запрос для получения статуса транзакции со след. параметрами:
 
@@ -110,7 +110,7 @@ var sdk = new MercurySDK({
 
 Помимо `status` запрос на `statusUrl` должен вернуть `confirmations`
 
-##  Вызов плагина
+## Вызов плагина
 
 ```
 sdk.checkout(price, currency)
@@ -125,7 +125,7 @@ sdk.checkout(price, currency)
   
 *  `email` - Принимает текст email заказчика, отправляется на `checkoutUrl` в качестве параметра
 
-##  Callback events
+## Callback events
 
 После инициализации плагина можно будет вызвать callback события через `sdk.on('close', (obj) => console.log(obj))`
 
@@ -151,17 +151,17 @@ sdk.checkout(price, currency)
 все данные кроме `status` придут после выбора криптовалюты, а `status` будет меняться в процессе транзакции в
 зависимости от полученного статуса при отправке запроса на `statusUrl`
 
-##  PUBLIC_URL
+## PUBLIC_URL
 
 `PUBLIC_URL` - параметр в .env надо прописать этот параметр на тот ресурс откуда будут загружаться статика, с файлы
 должны быть такой же структуры как в /build папке
 
-##  Localization
+## Localization
 
 Можно добавлять доп. локализации для модалки, их можно точно так же описывать в файле `in18.js` в
 папке `src/translations`
 
-##  Dev mode
+## Dev mode
 
 Чтобы запустить проект в `development` режиме нужно в файле `.env` значение переменной `REACT_APP_DEVELOPMENT` нужно
 поменять на `development`.
