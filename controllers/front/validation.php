@@ -36,16 +36,9 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
 
         //get cart currency
         $currency = new Currency($currency_id);
-        $currency_iso =  $currency->iso_code;
-
-        //get available currencies
-        $module_currencies = $this->module->getAvailableCurrencies();
-        //if order currency is not equal to one of the module currency we stop process
-        if ($module_currencies) {
-            $module_currencies_array = array_keys($module_currencies);
-            if (!in_array($currency_iso, $module_currencies_array)) {
-                die(Tools::jsonEncode(['data' => ['error' => 'Order currency not allowed.']]));
-            }
+        $currency_iso = $currency->iso_code;
+        if ($this->checkModuleCurrencies($currency_iso)) {
+            die(Tools::jsonEncode(['data' => ['error' => 'Order currency not allowed.']]));
         }
 
         //get cart parameters
@@ -73,11 +66,9 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         }
 
         //create transaction
-        $adapter = $this->module->isSandbox() ?
-            new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
-            new \MercuryCash\SDK\Adapter($api_key);
-
+        $adapter = $this->getAdapter($api_key);
         $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
+
         try {
             $transaction = $endpoint->create([
                 'crypto' => $crypto_type,
@@ -132,17 +123,7 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
 
         $address = $transaction->getAddress();
         $crypto_amount = $transaction->getCryptoAmount();
-
-        switch ($crypto_type) {
-            case 'BTC':
-                $type = 'bitcoin';
-                break;
-            case 'ETH':
-                $type = 'ethereum';
-                break;
-            case 'DASH':
-                $type = 'dash';
-        }
+        $type = $this->getType($crypto_type);
         //get qr-code address
         $qr = "$type:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
 
@@ -169,6 +150,56 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
          * Add your checks right there
          */
         return true;
+    }
+
+
+    /**
+     * @param $currency_iso
+     *
+     * @return bool
+     */
+    private function checkModuleCurrencies($currency_iso)
+    {
+        //get available currencies
+        $module_currencies = $this->module->getAvailableCurrencies();
+        //if order currency is not equal to one of the module currency we stop process
+        if ($module_currencies) {
+            $module_currencies_array = array_keys($module_currencies);
+            if (!in_array($currency_iso, $module_currencies_array)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * @param $api_key
+     */
+    private function getAdapter($api_key)
+    {
+        $this->module->isSandbox() ?
+            new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
+            new \MercuryCash\SDK\Adapter($api_key);
+    }
+
+
+    private function getType($crypto_type)
+    {
+        switch ($crypto_type) {
+            case 'BTC':
+                $type = 'bitcoin';
+                break;
+            case 'ETH':
+                $type = 'ethereum';
+                break;
+            case 'DASH':
+                $type = 'dash';
+                break;
+            default:
+                $type = 'bitcoin';
+        }
+        return $type;
     }
 
 }
