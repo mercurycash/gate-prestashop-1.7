@@ -3,6 +3,8 @@
 class MercuryCashValidationModuleFrontController extends ModuleFrontController
 {
 
+    private $available_crypto_types = ['BTC', 'ETH', 'DASH'];
+
     /**
      * This class should be use by your Instant Payment
      * Notification system to validate the order remotely
@@ -12,24 +14,22 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         /*
          * If the module is not active anymore, no need to process anything.
          */
-        if ($this->module->active == false) {
-            die;
-        }
+        if ($this->module->active == false) die;
 
         /**
          * Since it is an example, we choose sample data,
          * You'll have to get the correct values :)
          */
-        $order_cart = $this->context->cart;
-        $cart_id = $order_cart->id;
+        $order_cart  = $this->context->cart;
+        $cart_id     = $order_cart->id;
         $customer_id = $order_cart->id_customer;
         $currency_id = $this->context->cart->id_currency;
 
         /*
          * Restore the context from the $cart_id & the $customer_id to process the validation properly.
          */
-        $context = Context::getContext();
-        $context->cart = new Cart((int) $cart_id);
+        $context           = Context::getContext();
+        $context->cart     = new Cart((int) $cart_id);
         $context->customer = new Customer((int) $customer_id);
         $context->currency = new Currency((int) $context->cart->id_currency);
         $context->language = new Language((int) $context->customer->id_lang);
@@ -46,10 +46,9 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         $crypto_type = Tools::getValue('crypto');
         $secure_key = $context->customer->secure_key;
         $this->context->cookie->__set('secure_key', $secure_key);
-        $available_crypto_types = ['BTC', 'ETH', 'DASH'];
 
         //check crypto type
-        if (!in_array($crypto_type, $available_crypto_types)) {
+        if (!in_array($crypto_type, $this->available_crypto_types)) {
             die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Wrong crypto currency type.']]));
         }
 
@@ -68,58 +67,25 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         //create transaction
         $adapter = $this->getAdapter($api_key);
         $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
-
-        try {
-            $transaction = $endpoint->create([
-                'crypto' => $crypto_type,
-                'fiat' => $currency_iso,
-                'amount' => $amount,
-                'tip' => 0,
-            ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-            $error = $response->getBody()->getContents();
+        $transaction = $this->getTransaction($endpoint, $crypto_type, $currency_iso, $amount);
+        if ($transaction === false) {
             die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $response = $e->getResponse();
-            $error = $response->getBody()->getContents();
-            die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
-        } catch (Exception $e) {
-            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
         }
 
         //get transaction uid;
         $uuid = $transaction->getUuid();
 
-         //checkout transaction
-        try {
-            $checkout = $endpoint->process($uuid);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-            $error = $response->getBody()->getContents();
-            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $response = $e->getResponse();
-            $error = $response->getBody()->getContents();
-            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
-        } catch (Exception $e) {
-            die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
+        //checkout transaction
+        $checkout = $this->getCheckout($endpoint, $uuid);
+        if ($checkout === false) {
+            die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
         }
 
         //get status of transaction
-         try {
-             $status = $endpoint->status($uuid);
-         } catch (\GuzzleHttp\Exception\ClientException $e) {
-             $response = $e->getResponse();
-             $error = $response->getBody()->getContents();
-             die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
-         } catch (\GuzzleHttp\Exception\ServerException $e) {
-             $response = $e->getResponse();
-             $error = $response->getBody()->getContents();
-             die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
-         } catch (Exception $e) {
-             die(Tools::jsonEncode(['data' => ['result'=> false, 'error' => 'Mercury error. Please, try later.']]));
-         }
+        $status = $this->getStatus($endpoint, $uuid);
+        if ($status === false) {
+            die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
+        }
 
         $address = $transaction->getAddress();
         $crypto_amount = $transaction->getCryptoAmount();
@@ -183,7 +149,6 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
             new \MercuryCash\SDK\Adapter($api_key);
     }
 
-
     private function getType($crypto_type)
     {
         switch ($crypto_type) {
@@ -200,6 +165,78 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
                 $type = 'bitcoin';
         }
         return $type;
+    }
+
+    /**
+     * @param \GuzzleHttp\Exception\BadResponseException $e
+     *
+     * @return string
+     */
+    private function getError(\GuzzleHttp\Exception\BadResponseException $e)
+    {
+        $response = $e->getResponse();
+        return $response->getBody()->getContents();
+    }
+
+    private function getTransaction($endpoint, $crypto_type, $currency_iso, $amount)
+    {
+        try {
+            $transaction = $endpoint->create([
+                'crypto' => $crypto_type,
+                'fiat' => $currency_iso,
+                'amount' => $amount,
+                'tip' => 0,
+            ]);
+            return $transaction;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $error = $this->getError($e);
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $error = $this->getError($e);
+        } catch (Exception $e) {
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $endpoint
+     * @param $uuid
+     *
+     * @return bool
+     */
+    private function getCheckout($endpoint, $uuid)
+    {
+        try {
+            $checkout = $endpoint->process($uuid);
+            return $checkout;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $error = $this->getError($e);
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $error = $this->getError($e);
+        } catch (Exception $e) {
+        }
+        return false;
+    }
+
+
+    /**
+     * @param $endpoint
+     * @param $uuid
+     *
+     * @return bool
+     */
+    private function getStatus($endpoint, $uuid)
+    {
+        try {
+            $status = $endpoint->status($uuid);
+            return $status;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $error = $this->getError($e);
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $error = $this->getError($e);
+        } catch (Exception $e) {
+        }
+        return false;
     }
 
 }
