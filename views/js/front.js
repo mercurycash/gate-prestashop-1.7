@@ -16,7 +16,7 @@ $(document).ready(function () {
                 url: get_settings_url,
                 type: 'post',
                 dataType: 'json',
-                success: function(data) {
+                success(data) {
                     var price        = data.price;
                     var currency     = data.currency;
                     var minimum_btc  = data.minimum_btc;
@@ -81,7 +81,7 @@ $(document).ready(function () {
                         }
                     });
                 },
-                error: function (jqXHR, exception) {
+                error(jqXHR, exception) {
                     var msg = '';
                     if (jqXHR.status === 0) {
                         msg = 'Not connect.\n Verify Network.';
