@@ -34,7 +34,6 @@ class Transaction implements ApiInterface
      */
     public function create(array $data): TransactionResponse
     {
-        $log = dirname(__FILE__) . '/debug.log';
         $data = $this->adapter->post('checkout', CreateTransaction::fromArray($data));
 
         $this->body = json_decode($data->getBody());
@@ -47,6 +46,8 @@ class Transaction implements ApiInterface
 
     /**
      * @param string $uuid
+     *
+     * @return \MercuryCash\SDK\Responses\Checkout
      */
     public function process(string $uuid)
     {
@@ -63,6 +64,8 @@ class Transaction implements ApiInterface
 
     /**
      * @param array $data
+     *
+     * @return array
      */
     public function billing(array $data)
     {
@@ -78,6 +81,8 @@ class Transaction implements ApiInterface
 
     /**
      * @param string $uuid
+     *
+     * @return \MercuryCash\SDK\Responses\Status
      */
     public function status(string $uuid)
     {
