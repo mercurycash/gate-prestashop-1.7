@@ -5,11 +5,11 @@ $(document).ready(function () {
             e.preventDefault();
             $("body").prepend('<div id="mercury-cash"></div>');
 
-            var url              = $("input[name='url']").val();
-            var statusUrl       = $("input[name='status_url']").val();
+            var url            = $("input[name='url']").val();
+            var statusUrl      = $("input[name='status_url']").val();
             var getSettingsUrl = $("input[name='get_settings_url']").val();
-            var successUrl      = $("input[name='success_url']").val();
-            var refreshPeriod   = $("input[name='refresh_period']").val() * 1000;
+            var successUrl     = $("input[name='success_url']").val();
+            var refreshPeriod  = $("input[name='refresh_period']").val() * 1000;
 
             $.ajax({
                 ajax: 1,

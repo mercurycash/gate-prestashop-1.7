@@ -43,9 +43,9 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         }
 
         //get cart parameters
-        $amount = $this->context->cart->getOrderTotal();
+        $amount      = $this->context->cart->getOrderTotal();
         $crypto_type = Tools::getValue('crypto');
-        $secure_key = $context->customer->secure_key;
+        $secure_key  = $context->customer->secure_key;
         $this->context->cookie->__set('secure_key', $secure_key);
 
         //check crypto type
@@ -150,6 +150,11 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
             new \MercuryCash\SDK\Adapter($api_key);
     }
 
+    /**
+     * @param $crypto_type
+     *
+     * @return string
+     */
     private function getType($crypto_type)
     {
         switch ($crypto_type) {
