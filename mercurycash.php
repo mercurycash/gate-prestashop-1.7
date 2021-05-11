@@ -1,28 +1,4 @@
 <?php
-/**
-* 2007-2020 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2020 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
 
 require_once('vendor/autoload.php');
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
@@ -42,13 +18,13 @@ class MercuryCash extends PaymentModule
      */
     public function __construct()
     {
-        $this->name = 'mercurycash';
-        $this->tab = 'payments_gateways';
-        $this->version = '1.0.0';
-        $this->author = '2V Modules';
+        $this->name          = 'mercurycash';
+        $this->tab           = 'payments_gateways';
+        $this->version       = '1.0.0';
+        $this->author        = '2V Modules';
         $this->need_instance = 0;
-        $this->active = true;
-        $this->currencies = true;
+        $this->active        = true;
+        $this->currencies    = true;
 
         /**
          * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
@@ -119,10 +95,10 @@ class MercuryCash extends PaymentModule
     {
         $helper = new HelperForm();
 
-        $helper->show_toolbar = false;
-        $helper->table = $this->table;
-        $helper->module = $this;
-        $helper->default_form_language = $this->context->language->id;
+        $helper->show_toolbar             = false;
+        $helper->table                    = $this->table;
+        $helper->module                   = $this;
+        $helper->default_form_language    = $this->context->language->id;
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
         $helper->identifier = $this->identifier;
@@ -133,8 +109,8 @@ class MercuryCash extends PaymentModule
 
         $helper->tpl_vars = array(
             'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
+            'languages'    => $this->context->controller->getLanguages(),
+            'id_language'  => $this->context->language->id,
         );
 
         return $helper->generateForm(array($this->getConfigForm()));
@@ -268,98 +244,22 @@ class MercuryCash extends PaymentModule
         $sandbox     = Tools::getValue('MERCURYCASH_SANDBOX');
         $period      = Tools::getValue('MERCURYCASH_STATUS_PERIOD');
 
-        $this->context->controller->errors = [];
-        $this->context->controller->confirmations = [];
+        $this->clearNotifications();
+        $period_error = !$this->checkPeriod($period);
 
-        if (!is_numeric($period) || $period < 1 || $period > 15) {
-            $period_error = true;
-        }
-        try {
-            if (!$public_key || !$private_key) {
-                throw new Exception('wrong credentials');
-            }
-            $api_key = $this->getApiKey($public_key, $private_key);
-            $adapter = new \MercuryCash\SDK\Adapter($api_key);
-            $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
-            $endpoint->status('test');
-            $this->context->controller->confirmations[] = 'Mercury credentials were verified';
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            if (strpos($e->getMessage(), '[status code] 424') === false) {
-                $this->context->controller->confirmations[] = 'Mercury credentials were verified';
-            } else {
-                $this->context->controller->errors[] = 'Wrong Mercury credentials';
-            }
-            $this->context->controller->errors[] = $e->getMessage();
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $response = $e->getResponse();
-            if ($response->getStatusCode() == 500) {
-                $credentials_error = true;
-                $this->context->controller->errors[] = 'Wrong Mercury credentials';
-            }
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-            if ($response->getStatusCode() == 500) {
-                $credentials_error = true;
-                $this->context->controller->errors[] = 'Wrong Mercury credentials';
-            }
-        } catch (Exception $e) {
-            $credentials_error = true;
-            $this->context->controller->errors[] = 'Wrong Mercury credentials';
-        }
+        $credentials_error = !$this->checkCredentials($public_key, $private_key);
 
         if ($sandbox) {
             $public_key = Tools::getValue('MERCURYCASH_PUBLIC_KEY_SANDBOX');
             $private_key = Tools::getValue('MERCURYCASH_PRIVATE_KEY_SANDBOX');
-            try {
-                if (!$public_key || !$private_key) {
-                    throw new Exception('wrong credentials');
-                }
-                $api_key = $this->getApiKey($public_key, $private_key);
-                $adapter = new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk');
-                $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
-                $endpoint->status('test');
-            } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-                if (strpos($e->getMessage(), '[status code] 424') === false) {
-                    $this->context->controller->confirmations[] = 'Mercury credentials for Sandbox were verified';
-                } else {
-                    $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
-                }
-            } catch (\GuzzleHttp\Exception\ServerException $e) {
-                $response = $e->getResponse();
-                if ($response->getStatusCode() == 500) {
-                    $sandbox_credentials_error = true;
-                    $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
-                }
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                $response = $e->getResponse();
-                if ($response->getStatusCode() == 500) {
-                    $sandbox_credentials_error = true;
-                    $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
-                }
-            } catch (Exception $e) {
-                $sandbox_credentials_error = true;
-                $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
-            }
+            $sandbox_credentials_error = !$this->checkSandboxCredentials($public_key, $private_key);
         }
 
         if ($period_error) {
             $this->context->controller->errors[] = 'Wrong Period value';
         }
 
-        foreach (array_keys($form_values) as $key) {
-            $value = Tools::getValue($key);
-            if ($credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY' || $key === 'MERCURYCASH_PRIVATE_KEY')) {
-                $value = null;
-            }
-            if ($sandbox_credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY_SANDBOX' || $key === 'MERCURYCASH_PRIVATE_KEY_SANDBOX')) {
-                $value = null;
-            }
-            if ($period_error && $key === 'MERCURYCASH_STATUS_PERIOD') {
-                $value = 5;
-            }
-            Configuration::updateValue($key, $value);
-        }
-
+        $this->updateConfiguration($form_values, $credentials_error, $sandbox_credentials_error, $period_error);
     }
 
 
@@ -595,5 +495,131 @@ class MercuryCash extends PaymentModule
         }
     }
 
+    /**
+     * @param $form_values
+     * @param $credentials_error
+     * @param $sandbox_credentials_error
+     * @param $period_error
+     */
+    private function updateConfiguration($form_values, $credentials_error, $sandbox_credentials_error, $period_error)
+    {
+        foreach (array_keys($form_values) as $key) {
+            $value = Tools::getValue($key);
+            if ($credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY' || $key === 'MERCURYCASH_PRIVATE_KEY')) {
+                $value = null;
+            }
+            if ($sandbox_credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY_SANDBOX' || $key === 'MERCURYCASH_PRIVATE_KEY_SANDBOX')) {
+                $value = null;
+            }
+            if ($period_error && $key === 'MERCURYCASH_STATUS_PERIOD') {
+                $value = 5;
+            }
+            Configuration::updateValue($key, $value);
+        }
+    }
+
+    /**
+     * @param $period
+     *
+     * @return bool
+     */
+    private function checkPeriod($period)
+    {
+        return is_numeric($period) && $period >= 1 && $period <= 15;
+    }
+
+    private function clearNotifications()
+    {
+        $this->context->controller->errors = [];
+        $this->context->controller->confirmations = [];
+    }
+
+    /**
+     * @param $public_key
+     * @param $private_key
+     *
+     * @return bool
+     */
+    private function checkCredentials($public_key, $private_key)
+    {
+        try {
+            if (!$public_key || !$private_key) {
+                throw new Exception('wrong credentials');
+            }
+            $api_key  = $this->getApiKey($public_key, $private_key);
+            $adapter  = new \MercuryCash\SDK\Adapter($api_key);
+            $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
+            $endpoint->status('test');
+            $this->context->controller->confirmations[] = 'Mercury credentials were verified';
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if (strpos($e->getMessage(), '[status code] 424') === false) {
+                $this->context->controller->confirmations[] = 'Mercury credentials were verified';
+            } else {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials';
+                return false;
+            }
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $response = $e->getResponse();
+            if ($response->getStatusCode() == 500) {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials';
+                return false;
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $e->getResponse();
+            if ($response->getStatusCode() == 500) {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials';
+                return false;
+            }
+        } catch (Exception $e) {
+            $this->context->controller->errors[] = 'Wrong Mercury credentials';
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param $public_key
+     * @param $private_key
+     *
+     * @return bool
+     */
+    private function checkSandboxCredentials($public_key, $private_key)
+    {
+        try {
+            if (!$public_key || !$private_key) {
+                throw new Exception('wrong credentials');
+            }
+            $api_key = $this->getApiKey($public_key, $private_key);
+            $adapter = $this->isSandbox() ?
+                new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
+                new \MercuryCash\SDK\Adapter($api_key);
+            $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
+            $endpoint->status('');
+            $this->context->controller->errors = [];
+        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
+            if (strpos($e->getMessage(), '[status code] 424') === false) {
+                $this->context->controller->confirmations[] = 'Mercury credentials for Sandbox were verified';
+            } else {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+                return false;
+            }
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $response = $e->getResponse();
+            if ($response->getStatusCode() == 500) {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+                return false;
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $e->getResponse();
+            if ($response->getStatusCode() == 500) {
+                $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+                return false;
+            }
+        } catch (Exception $e) {
+            $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+            return false;
+        }
+        return true;
+    }
 
 }
