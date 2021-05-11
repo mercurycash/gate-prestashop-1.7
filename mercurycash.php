@@ -583,26 +583,22 @@ class MercuryCash extends PaymentModule
             $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
             $endpoint->status('test');
             $this->context->controller->confirmations[] = 'Mercury credentials were verified';
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            if (strpos($e->getMessage(), '[status code] 424') === false) {
+        } catch (\GuzzleHttp\Exception\BadResponseException $exception) {
+            if (strpos($exception->getMessage(), '[status code] 424') === false) {
                 $this->context->controller->confirmations[] = 'Mercury credentials were verified';
             } else {
                 $this->context->controller->errors[] = 'Wrong Mercury credentials';
                 return false;
             }
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $response = $e->getResponse();
-            if ($response->getStatusCode() == 500) {
-                $this->context->controller->errors[] = 'Wrong Mercury credentials';
+        } catch (\GuzzleHttp\Exception\ServerException $exception) {
+            if ($this->checkIfNotException($exception)) {
                 return false;
             }
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-            if ($response->getStatusCode() == 500) {
-                $this->context->controller->errors[] = 'Wrong Mercury credentials';
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+            if ($this->checkIfNotException($exception)) {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $this->context->controller->errors[] = 'Wrong Mercury credentials';
             return false;
         }
@@ -628,30 +624,44 @@ class MercuryCash extends PaymentModule
             $endpoint = new \MercuryCash\SDK\Endpoints\Transaction($adapter);
             $endpoint->status('');
             $this->context->controller->errors = [];
-        } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-            if (strpos($e->getMessage(), '[status code] 424') === false) {
+        } catch (\GuzzleHttp\Exception\BadResponseException $exception) {
+            if (strpos($exception->getMessage(), '[status code] 424') === false) {
                 $this->context->controller->confirmations[] = 'Mercury credentials for Sandbox were verified';
             } else {
                 $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
                 return false;
             }
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $response = $e->getResponse();
-            if ($response->getStatusCode() == 500) {
-                $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+        } catch (\GuzzleHttp\Exception\ServerException $exception) {
+            if ($this->checkIfNotException($exception, true)) {
                 return false;
             }
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-            if ($response->getStatusCode() == 500) {
-                $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
+        } catch (\GuzzleHttp\Exception\ClientException $exception) {
+            if ($this->checkIfNotException($exception, true)) {
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param      $exception
+     *
+     * @param bool $is_sandbox
+     *
+     * @return bool
+     */
+    private function checkIfNotException($exception, $is_sandbox = false)
+    {
+        $response = $exception->getResponse();
+        if ($response->getStatusCode() == 500) {
+            $this->context->controller->errors[] = $is_sandbox ?
+                'Wrong Mercury credentials for Sandbox' : 'Wrong Mercury credentials';
+            return true;
+        }
+        return false;
     }
 
 }
