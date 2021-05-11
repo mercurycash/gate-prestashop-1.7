@@ -584,12 +584,11 @@ class MercuryCash extends PaymentModule
             $endpoint->status('test');
             $this->context->controller->confirmations[] = 'Mercury credentials were verified';
         } catch (\GuzzleHttp\Exception\BadResponseException $exception) {
-            if (strpos($exception->getMessage(), '[status code] 424') === false) {
-                $this->context->controller->confirmations[] = 'Mercury credentials were verified';
-            } else {
+            if (strpos($exception->getMessage(), '[status code] 424') !== false) {
                 $this->context->controller->errors[] = 'Wrong Mercury credentials';
                 return false;
             }
+            $this->context->controller->confirmations[] = 'Mercury credentials were verified';
         } catch (\GuzzleHttp\Exception\ServerException $exception) {
             if ($this->checkIfNotException($exception)) {
                 return false;
@@ -625,12 +624,11 @@ class MercuryCash extends PaymentModule
             $endpoint->status('');
             $this->context->controller->errors = [];
         } catch (\GuzzleHttp\Exception\BadResponseException $exception) {
-            if (strpos($exception->getMessage(), '[status code] 424') === false) {
-                $this->context->controller->confirmations[] = 'Mercury credentials for Sandbox were verified';
-            } else {
+            if (strpos($exception->getMessage(), '[status code] 424') !== false) {
                 $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
                 return false;
             }
+            $this->context->controller->confirmations[] = 'Mercury credentials for Sandbox were verified';
         } catch (\GuzzleHttp\Exception\ServerException $exception) {
             if ($this->checkIfNotException($exception, true)) {
                 return false;
