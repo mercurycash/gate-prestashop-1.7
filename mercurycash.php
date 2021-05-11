@@ -312,7 +312,7 @@ class MercuryCash extends PaymentModule
                 break;
             }
         }
-        
+
         if (!$check_minimum_amount) {
             return;
         }
@@ -649,6 +649,9 @@ class MercuryCash extends PaymentModule
         return false;
     }
 
+    /**
+     * @return bool
+     */
     private function checkCurrencies()
     {
         $module_currencies = $this->getAvailableCurrencies();

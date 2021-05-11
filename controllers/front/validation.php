@@ -158,7 +158,7 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
      * @param $currency_iso
      * @param $amount
      *
-     * @return bool
+     * @return mixed
      */
     private function getTransaction($endpoint, $crypto_type, $currency_iso, $amount)
     {
@@ -184,7 +184,7 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
      * @param $endpoint
      * @param $uuid
      *
-     * @return bool
+     * @return mixed
      */
     private function getCheckout($endpoint, $uuid)
     {
@@ -205,7 +205,7 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
      * @param $endpoint
      * @param $uuid
      *
-     * @return bool
+     * @return mixed
      */
     private function getStatus($endpoint, $uuid)
     {
