@@ -296,22 +296,8 @@ class MercuryCash extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        $currencies_check = $check_minimum_amount = false;
-        $module_currencies = $this->getAvailableCurrencies();
-
-        if ($module_currencies) {
-
-            $module_currencies_array = array_keys($module_currencies);
-            $currencies = CurrencyCore::getCurrencies();
-
-            if ($currencies && is_array($currencies)) {
-                foreach ($currencies as $currency) {
-                    if (in_array($currency['iso_code'], $module_currencies_array)) {
-                        $currencies_check = true;
-                    }
-                }
-            }
-        }
+        $check_minimum_amount = false;
+        $currencies_check = $this->checkCurrencies();
 
         if (!$this->active || !$currencies_check || !$this->checkCurrency($params['cart'])) {
             return;
@@ -326,6 +312,7 @@ class MercuryCash extends PaymentModule
                 break;
             }
         }
+        
         if (!$check_minimum_amount) {
             return;
         }
@@ -658,6 +645,26 @@ class MercuryCash extends PaymentModule
             $this->context->controller->errors[] = $is_sandbox ?
                 'Wrong Mercury credentials for Sandbox' : 'Wrong Mercury credentials';
             return true;
+        }
+        return false;
+    }
+
+    private function checkCurrencies()
+    {
+        $module_currencies = $this->getAvailableCurrencies();
+
+        if (!$module_currencies) {
+            return false;
+        }
+        $module_currencies_array = array_keys($module_currencies);
+        $currencies = CurrencyCore::getCurrencies();
+
+        if ($currencies && is_array($currencies)) {
+            foreach ($currencies as $currency) {
+                if (in_array($currency['iso_code'], $module_currencies_array)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
