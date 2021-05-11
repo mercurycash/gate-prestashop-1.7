@@ -45,14 +45,13 @@ class MercuryCashConfirmationModuleFrontController extends ModuleFrontController
              */
             $module_id = $this->module->id;
             Tools::redirect('index.php?controller=order-confirmation&id_cart=' . $cart_id . '&id_module=' . $module_id . '&id_order=' . $order_id . '&key=' . $secure_key);
-        } else {
-            /*
-             * An error occured and is shown on a new page.
-             */
-            $this->errors[] = $this->module->l('An error occured. Please contact the merchant to have more informations');
-
-            return $this->setTemplate('error.tpl');
         }
+        /*
+         * An error occured and is shown on a new page.
+         */
+        $this->errors[] = $this->module->l('An error occured. Please contact the merchant to have more informations');
+
+        return $this->setTemplate('error.tpl');
     }
 
 }

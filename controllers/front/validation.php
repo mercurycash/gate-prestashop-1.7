@@ -25,19 +25,12 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         $cart_id     = $order_cart->id;
         $customer_id = $order_cart->id_customer;
         $currency_id = $this->context->cart->id_currency;
-
-        /*
-         * Restore the context from the $cart_id & the $customer_id to process the validation properly.
-         */
-        $context           = Context::getContext();
-        $context->cart     = new Cart((int) $cart_id);
-        $context->customer = new Customer((int) $customer_id);
-        $context->currency = new Currency((int) $context->cart->id_currency);
-        $context->language = new Language((int) $context->customer->id_lang);
+        $context     = $this->getContext($cart_id,$customer_id);
 
         //get cart currency
-        $currency = new Currency($currency_id);
+        $currency     = new Currency($currency_id);
         $currency_iso = $currency->iso_code;
+
         if ($this->checkModuleCurrencies($currency_iso)) {
             die(Tools::jsonEncode(['data' => ['error' => 'Order currency not allowed.']]));
         }
@@ -76,36 +69,11 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         //get transaction uid;
         $uuid = $transaction->getUuid();
 
-        //checkout transaction
-        $checkout = $this->getCheckout($endpoint, $uuid);
-        if ($checkout === false) {
+        if (!$this->checkTransaction($endpoint, $uuid)) {
             die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
         }
 
-        //get status of transaction
-        $status = $this->getStatus($endpoint, $uuid);
-        if ($status === false) {
-            die(Tools::jsonEncode(['data' => ['error' => 'Mercury error. Please, try later.']]));
-        }
-
-        $address = $transaction->getAddress();
-        $crypto_amount = $transaction->getCryptoAmount();
-        $type = $this->getType($crypto_type);
-        //get qr-code address
-        $qr = "$type:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
-
-        die(Tools::jsonEncode([
-            'data' => [
-                'cryptoAmount' => $crypto_amount,
-                'confirmations' => 5,
-                'address' => $address,
-                'qrCodeText' => $qr,
-                'exchangeRate' => $transaction->getRate(),
-                'networkFee' => $transaction->getFee(),
-                'uuid' => $uuid,
-                'cryptoCurrency' => $crypto_type
-            ]
-        ]));
+        die(Tools::jsonEncode($this->getDataArray($transaction, $crypto_type)));
     }
 
     /**
@@ -251,6 +219,75 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         } catch (Exception $exception) {
         }
         return false;
+    }
+
+    /**
+     * @param $cart_id
+     * @param $customer_id
+     *
+     * @return mixed
+     */
+    private function getContext($cart_id, $customer_id)
+    {
+        /*
+        * Restore the context from the $cart_id & the $customer_id to process the validation properly.
+        */
+        $context           = Context::getContext();
+        $context->cart     = new Cart((int) $cart_id);
+        $context->customer = new Customer((int) $customer_id);
+        $context->currency = new Currency((int) $context->cart->id_currency);
+        $context->language = new Language((int) $context->customer->id_lang);
+        return $context;
+    }
+
+    /**
+     * @param $transaction
+     * @param $crypto_type
+     *
+     * @return array
+     */
+    private function getDataArray($transaction, $crypto_type)
+    {
+        $address = $transaction->getAddress();
+        $crypto_amount = $transaction->getCryptoAmount();
+        $type = $this->getType($crypto_type);
+        //get transaction uid;
+        $uuid = $transaction->getUuid();
+        //get qr-code address
+        $qr = "$type:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
+        return [
+            'data' => [
+                'cryptoAmount' => $crypto_amount,
+                'confirmations' => 5,
+                'address' => $address,
+                'qrCodeText' => $qr,
+                'exchangeRate' => $transaction->getRate(),
+                'networkFee' => $transaction->getFee(),
+                'uuid' => $uuid,
+                'cryptoCurrency' => $crypto_type
+            ]
+        ];
+    }
+
+    /**
+     * @param $endpoint
+     * @param $uuid
+     *
+     * @return bool
+     */
+    private function checkTransaction($endpoint, $uuid)
+    {
+        //checkout transaction
+        $checkout = $this->getCheckout($endpoint, $uuid);
+        if ($checkout === false) {
+            return false;
+        }
+        //get status of transaction
+        $status = $this->getStatus($endpoint, $uuid);
+        if ($status === false) {
+            return false;
+        }
+        return true;
     }
 
 }
