@@ -237,7 +237,6 @@ class MercuryCash extends PaymentModule
     protected function postProcess()
     {
         $form_values = $this->getConfigFormValues();
-        $credentials_error = $sandbox_credentials_error = $period_error = false;
 
         $public_key  = Tools::getValue('MERCURYCASH_PUBLIC_KEY');
         $private_key = Tools::getValue('MERCURYCASH_PRIVATE_KEY');
@@ -252,14 +251,14 @@ class MercuryCash extends PaymentModule
         if ($sandbox) {
             $public_key = Tools::getValue('MERCURYCASH_PUBLIC_KEY_SANDBOX');
             $private_key = Tools::getValue('MERCURYCASH_PRIVATE_KEY_SANDBOX');
-            $sandbox_credentials_error = !$this->checkSandboxCredentials($public_key, $private_key);
+            $sb_credentials_error = !$this->checkSandboxCredentials($public_key, $private_key);
         }
 
         if ($period_error) {
             $this->context->controller->errors[] = 'Wrong Period value';
         }
 
-        $this->updateConfiguration($form_values, $credentials_error, $sandbox_credentials_error, $period_error);
+        $this->updateConfiguration($form_values, $credentials_error, $sb_credentials_error, $period_error);
     }
 
 
@@ -498,24 +497,54 @@ class MercuryCash extends PaymentModule
     /**
      * @param $form_values
      * @param $credentials_error
-     * @param $sandbox_credentials_error
+     * @param $sb_credentials_error
      * @param $period_error
      */
-    private function updateConfiguration($form_values, $credentials_error, $sandbox_credentials_error, $period_error)
+    private function updateConfiguration($form_values, $credentials_error, $sb_credentials_error, $period_error)
     {
         foreach (array_keys($form_values) as $key) {
             $value = Tools::getValue($key);
-            if ($credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY' || $key === 'MERCURYCASH_PRIVATE_KEY')) {
+            if ($this->ifCredentialsError($credentials_error, $key) || $this->ifSandboxCredentialsError($sb_credentials_error, $key)) {
                 $value = null;
             }
-            if ($sandbox_credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY_SANDBOX' || $key === 'MERCURYCASH_PRIVATE_KEY_SANDBOX')) {
-                $value = null;
-            }
-            if ($period_error && $key === 'MERCURYCASH_STATUS_PERIOD') {
+            if ($this->ifPeriodError($period_error, $key)) {
                 $value = 5;
             }
             Configuration::updateValue($key, $value);
         }
+    }
+
+    /**
+     * @param $credentials_error
+     * @param $key
+     *
+     * @return bool
+     */
+    private function ifCredentialsError($credentials_error, $key)
+    {
+        return $credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY' || $key === 'MERCURYCASH_PRIVATE_KEY');
+    }
+
+    /**
+     * @param $credentials_error
+     * @param $key
+     *
+     * @return bool
+     */
+    private function ifSandboxCredentialsError($credentials_error, $key)
+    {
+        return $credentials_error && ($key === 'MERCURYCASH_PUBLIC_KEY_SANDBOX' || $key === 'MERCURYCASH_PRIVATE_KEY_SANDBOX');
+    }
+
+    /**
+     * @param $period_error
+     * @param $key
+     *
+     * @return bool
+     */
+    private function ifPeriodError($period_error, $key)
+    {
+        return $period_error && $key === 'MERCURYCASH_STATUS_PERIOD';
     }
 
     /**
@@ -528,6 +557,9 @@ class MercuryCash extends PaymentModule
         return is_numeric($period) && $period >= 1 && $period <= 15;
     }
 
+    /**
+     *
+     */
     private function clearNotifications()
     {
         $this->context->controller->errors = [];
