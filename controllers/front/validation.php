@@ -110,10 +110,12 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
 
     /**
      * @param $api_key
+     *
+     * @return \MercuryCash\SDK\Adapter
      */
     private function getAdapter($api_key)
     {
-        $this->module->isSandbox() ?
+        return $this->module->isSandbox() ?
             new \MercuryCash\SDK\Adapter($api_key, 'https://api-way.mercurydev.tk') :
             new \MercuryCash\SDK\Adapter($api_key);
     }
