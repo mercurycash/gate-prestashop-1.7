@@ -31,7 +31,7 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         $currency     = new Currency($currency_id);
         $currency_iso = $currency->iso_code;
 
-        if ($this->checkModuleCurrencies($currency_iso)) {
+        if (!$this->checkModuleCurrencies($currency_iso)) {
             die(Tools::jsonEncode(['data' => ['error' => 'Order currency not allowed.']]));
         }
 
