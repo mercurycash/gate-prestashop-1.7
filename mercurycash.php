@@ -280,7 +280,7 @@ class MercuryCash extends PaymentModule
     public function hookHeader()
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        $this->context->controller->addJS($this->_path.'/mercury-cash-react/build/static/js/main.3d3f7b08.js');
+        $this->context->controller->addJS($this->_path.'/mercury-cash-react/build/static/js/main.b6c7872e.js');
         $this->context->controller->addCSS($this->_path.'/mercury-cash-react/build/static/css/main.d17b8e8c.css');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
