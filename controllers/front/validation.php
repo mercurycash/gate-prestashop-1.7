@@ -254,13 +254,13 @@ class MercuryCashValidationModuleFrontController extends ModuleFrontController
         //get transaction uid;
         $uuid = $transaction->getUuid();
         //get qr-code address
-        $qr = "$type:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
+        $qr_code = "$type:$address?amount=$crypto_amount&cryptoCurrency=$crypto_type";
         return [
             'data' => [
                 'cryptoAmount' => $crypto_amount,
                 'confirmations' => 5,
                 'address' => $address,
-                'qrCodeText' => $qr,
+                'qrCodeText' => $qr_code,
                 'exchangeRate' => $transaction->getRate(),
                 'networkFee' => $transaction->getFee(),
                 'uuid' => $uuid,

@@ -46,7 +46,7 @@ class MercuryCash extends PaymentModule
     public function install()
     {
 
-        include(dirname(__FILE__).'/sql/install.php');
+        include(__DIR__ . '/sql/install.php');
 
         Configuration::updateValue('MERCURYCASH_STATUS_PERIOD', 5);
         Configuration::updateValue('MERCURYCASH_BITCOIN_MIN', 40);
@@ -67,7 +67,7 @@ class MercuryCash extends PaymentModule
      */
     public function uninstall()
     {
-        include(dirname(__FILE__).'/sql/uninstall.php');
+        include(__DIR__ . '/sql/uninstall.php');
 
         return parent::uninstall();
     }
