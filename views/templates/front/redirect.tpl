@@ -24,22 +24,22 @@
 *}
 
 <div>
-	<h3>{l s='Redirect your customer' mod='MercuryCash'}:</h3>
+	<h3>{l s='Redirect your customer' mod='mercurycash'}:</h3>
 	<ul class="alert alert-info">
-			<li>{l s='This action should be used to redirect your customer to the website of your payment processor' mod='MercuryCash'}.</li>
+			<li>{l s='This action should be used to redirect your customer to the website of your payment processor' mod='mercurycash'}.</li>
 	</ul>
 	
 	<div class="alert alert-warning">
-		{l s='You can redirect your customer with an error message' mod='MercuryCash'}:
-		<a href="{$link->getModuleLink('MercuryCash', 'redirect', ['action' => 'error'], true)|escape:'htmlall':'UTF-8'}" title="{l s='Look at the error' mod='MercuryCash'}">
-			<strong>{l s='Look at the error message' mod='MercuryCash'}</strong>
+		{l s='You can redirect your customer with an error message' mod='mercurycash'}:
+		<a href="{$link->getModuleLink('mercurycash', 'redirect', ['action' => 'error'], true)|escape:'htmlall':'UTF-8'}" title="{l s='Look at the error' mod='mercurycash'}">
+			<strong>{l s='Look at the error message' mod='mercurycash'}</strong>
 		</a>
 	</div>
 	
 	<div class="alert alert-success">
-		{l s='You can also redirect your customer to the confirmation page' mod='MercuryCash'}:
-		<a href="{$link->getModuleLink('MercuryCash', 'confirmation', ['cart_id' => $cart_id, 'secure_key' => $secure_key], true)|escape:'htmlall':'UTF-8'}" title="{l s='Confirm' mod='MercuryCash'}">
-			<strong>{l s='Go to the confirmation page' mod='MercuryCash'}</strong>
+		{l s='You can also redirect your customer to the confirmation page' mod='mercurycash'}:
+		<a href="{$link->getModuleLink('mercurycash', 'confirmation', ['cart_id' => $cart_id, 'secure_key' => $secure_key], true)|escape:'htmlall':'UTF-8'}" title="{l s='Confirm' mod='mercurycash'}">
+			<strong>{l s='Go to the confirmation page' mod='mercurycash'}</strong>
 		</a>
 	</div>
 </div>

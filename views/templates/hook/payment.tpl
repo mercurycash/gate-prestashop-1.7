@@ -28,13 +28,13 @@
 		<p class="payment_module" id="MercuryCash_payment_button">
 			{if $cart->getOrderTotal() < 2}
 				<a href="">
-					<img src="{$domain|cat:$payment_button|escape:'html':'UTF-8'}" alt="{l s='Pay with my payment module' mod='MercuryCash'}" />
-					{l s='Minimum amount required in order to pay with my payment module:' mod='MercuryCash'} {convertPrice price=2}
+					<img src="{$domain|cat:$payment_button|escape:'html':'UTF-8'}" alt="{l s='Pay with my payment module' mod='mercurycash'}" />
+					{l s='Minimum amount required in order to pay with my payment module:' mod='mercurycash'} {convertPrice price=2}
 				</a>
 			{else}
-				<a href="{$link->getModuleLink('MercuryCash', 'redirect', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Pay with my payment module' mod='MercuryCash'}">
-					<img src="{$module_dir|escape:'htmlall':'UTF-8'}/logo.png" alt="{l s='Pay with my payment module' mod='MercuryCash'}" width="32" height="32" />
-					{l s='Pay with my payment module' mod='MercuryCash'}
+				<a href="{$link->getModuleLink('mercurycash', 'redirect', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Pay with my payment module' mod='mercurycash'}">
+					<img src="{$module_dir|escape:'htmlall':'UTF-8'}/logo.png" alt="{l s='Pay with my payment module' mod='mercurycash'}" width="32" height="32" />
+					{l s='Pay with my payment module' mod='mercurycash'}
 				</a>
 			{/if}
 		</p>

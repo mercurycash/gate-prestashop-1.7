@@ -280,8 +280,8 @@ class MercuryCash extends PaymentModule
     public function hookHeader()
     {
         $this->context->controller->addJS($this->_path.'/views/js/front.js');
-        $this->context->controller->addJS($this->_path.'/mercury-cash-react/build/static/js/main.b6c7872e.js');
-        $this->context->controller->addCSS($this->_path.'/mercury-cash-react/build/static/css/main.d17b8e8c.css');
+        $this->context->controller->addJS($this->_path.'/mercury-cash-react/build/static/js/main.1fb61edb.js');
+        $this->context->controller->addCSS($this->_path.'/mercury-cash-react/build/static/css/main.0671e770.css');
         $this->context->controller->addCSS($this->_path.'/views/css/front.css');
     }
 
@@ -342,16 +342,17 @@ class MercuryCash extends PaymentModule
         $status_url   = $this->context->link->getModuleLink($this->name, 'check',      array('ajax' => true));
         $settings_url = $this->context->link->getModuleLink($this->name, 'settings',   array('ajax' => true));
         $success_url  = $this->context->link->getModuleLink($this->name, 'success',    array('ajax' => true));
-
+        $modules_dir  = defined('_MODULE_DIR_') ? _MODULE_DIR_  : '/modules/';
         $refresh_period = Configuration::get('MERCURYCASH_STATUS_PERIOD', null, null, null, 5);
 
         $this->context->smarty->assign([
             'get_settings_url' => $settings_url,
-            'success_url' => $success_url,
-            'action' => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
-            'url' => $process_url,
-            'status_url' => $status_url,
-            'refresh_period' => $refresh_period
+            'success_url'      => $success_url,
+            'action'           => $this->context->link->getModuleLink($this->name, 'validation', array(), true),
+            'url'              => $process_url,
+            'status_url'       => $status_url,
+            'refresh_period'   => $refresh_period,
+            'modules_dir'      => $modules_dir
         ]);
 
         return $this->context->smarty->fetch('module:mercurycash/views/templates/front/payment_form.tpl');
@@ -571,7 +572,7 @@ class MercuryCash extends PaymentModule
             $endpoint->status('test');
             $this->context->controller->confirmations[] = 'Mercury credentials were verified';
         } catch (\GuzzleHttp\Exception\BadResponseException $exception) {
-            if (strpos($exception->getMessage(), '[status code] 424') !== false) {
+            if (strpos($exception->getMessage(), '[status code] 424') !== false || strpos($exception->getMessage(), '[status code] 401') !== false) {
                 $this->context->controller->errors[] = 'Wrong Mercury credentials';
                 return false;
             }
@@ -611,7 +612,7 @@ class MercuryCash extends PaymentModule
             $endpoint->status('');
             $this->context->controller->errors = [];
         } catch (\GuzzleHttp\Exception\BadResponseException $exception) {
-            if (strpos($exception->getMessage(), '[status code] 424') !== false) {
+            if (strpos($exception->getMessage(), '[status code] 424') !== false || strpos($exception->getMessage(), '[status code] 401') !== false) {
                 $this->context->controller->errors[] = 'Wrong Mercury credentials for Sandbox';
                 return false;
             }

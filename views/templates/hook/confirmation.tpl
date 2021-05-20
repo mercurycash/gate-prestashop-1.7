@@ -24,19 +24,19 @@
 *}
 
 {if (isset($status) == true) && ($status == 'ok')}
-<h3>{l s='Your order on %s is complete.' sprintf=$shop_name mod='MercuryCash'}</h3>
+<h3>{l s='Your order on %s is complete.' sprintf=$shop_name mod='mercurycash'}</h3>
 <p>
-	<br />- {l s='Amount' mod='MercuryCash'} : <span class="price"><strong>{$total|escape:'htmlall':'UTF-8'}</strong></span>
-	<br />- {l s='Reference' mod='MercuryCash'} : <span class="reference"><strong>{$reference|escape:'html':'UTF-8'}</strong></span>
-	<br /><br />{l s='An email has been sent with this information.' mod='MercuryCash'}
-	<br /><br />{l s='If you have questions, comments or concerns, please contact our' mod='MercuryCash'} <a href="{$link->getPageLink('contact', true)|escape:'html':'UTF-8'}">{l s='expert customer support team.' mod='MercuryCash'}</a>
+	<br />- {l s='Amount' mod='mercurycash'} : <span class="price"><strong>{$total|escape:'htmlall':'UTF-8'}</strong></span>
+	<br />- {l s='Reference' mod='mercurycash'} : <span class="reference"><strong>{$reference|escape:'html':'UTF-8'}</strong></span>
+	<br /><br />{l s='An email has been sent with this information.' mod='mercurycash'}
+	<br /><br />{l s='If you have questions, comments or concerns, please contact our' mod='mercurycash'} <a href="{$link->getPageLink('contact', true)|escape:'html':'UTF-8'}">{l s='expert customer support team.' mod='mercurycash'}</a>
 </p>
 {else}
-<h3>{l s='Your order on %s has not been accepted.' sprintf=$shop_name mod='MercuryCash'}</h3>
+<h3>{l s='Your order on %s has not been accepted.' sprintf=$shop_name mod='mercurycash'}</h3>
 <p>
-	<br />- {l s='Reference' mod='MercuryCash'} <span class="reference"> <strong>{$reference|escape:'html':'UTF-8'}</strong></span>
-	<br /><br />{l s='Please, try to order again.' mod='MercuryCash'}
-	<br /><br />{l s='If you have questions, comments or concerns, please contact our' mod='MercuryCash'} <a href="{$link->getPageLink('contact', true)|escape:'html':'UTF-8'}">{l s='expert customer support team.' mod='MercuryCash'}</a>
+	<br />- {l s='Reference' mod='mercurycash'} <span class="reference"> <strong>{$reference|escape:'html':'UTF-8'}</strong></span>
+	<br /><br />{l s='Please, try to order again.' mod='mercurycash'}
+	<br /><br />{l s='If you have questions, comments or concerns, please contact our' mod='mercurycash'} <a href="{$link->getPageLink('contact', true)|escape:'html':'UTF-8'}">{l s='expert customer support team.' mod='mercurycash'}</a>
 </p>
 {/if}
 <hr />

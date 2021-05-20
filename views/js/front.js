@@ -7,6 +7,7 @@ $(document).ready(function () {
 
             var url            = $("input[name='url']").val();
             var statusUrl      = $("input[name='status_url']").val();
+            var staticUrl      = $("input[name='static_url']").val();
             var getSettingsUrl = $("input[name='get_settings_url']").val();
             var successUrl     = $("input[name='success_url']").val();
             var refreshPeriod  = $("input[name='refresh_period']").val() * 1000;
@@ -27,6 +28,7 @@ $(document).ready(function () {
                     var sdk = new MercurySDK({
                         checkoutUrl: url,
                         statusUrl: statusUrl,
+                        staticUrl: staticUrl,
                         checkStatusInterval: refreshPeriod,
                         mount: "#mercury-cash",
                         lang: "en",

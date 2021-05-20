@@ -1,28 +1,28 @@
 {
   "files": {
-    "main.css": "./modules/mercurycash/mercury-cash-react/build/static/css/main.d17b8e8c.css",
-    "main.js": "./modules/mercurycash/mercury-cash-react/build/static/js/main.b6c7872e.js",
-    "main.js.map": "./modules/mercurycash/mercury-cash-react/build/static/js/main.b6c7872e.js.map",
-    "index.html": "./modules/mercurycash/mercury-cash-react/build/index.html",
-    "static/css/main.d17b8e8c.css.map": "./modules/mercurycash/mercury-cash-react/build/static/css/main.d17b8e8c.css.map",
-    "static/js/main.b6c7872e.js.LICENSE.txt": "./modules/mercurycash/mercury-cash-react/build/static/js/main.b6c7872e.js.LICENSE.txt",
-    "static/media/done.97c0edd9.png": "./modules/mercurycash/mercury-cash-react/build/static/media/done.97c0edd9.png",
-    "static/media/icon-back-arrow.16d09450.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-back-arrow.16d09450.svg",
-    "static/media/icon-btc-hover.73daedbb.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-btc-hover.73daedbb.svg",
-    "static/media/icon-btc.a3c59e5d.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-btc.a3c59e5d.svg",
-    "static/media/icon-close.714896e2.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-close.714896e2.svg",
-    "static/media/icon-copy.905df0cc.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-copy.905df0cc.svg",
-    "static/media/icon-dash-hover.b67dcaf6.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-dash-hover.b67dcaf6.svg",
-    "static/media/icon-dash.142147ab.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-dash.142147ab.svg",
-    "static/media/icon-eth-hover.cc9ef334.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-eth-hover.cc9ef334.svg",
-    "static/media/icon-eth.a0d321c0.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/icon-eth.a0d321c0.svg",
-    "static/media/logo-with-text.396c0876.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/logo-with-text.396c0876.svg",
-    "static/media/logo.101326de.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/logo.101326de.svg",
-    "static/media/preloader.a7cb2a7c.gif": "./modules/mercurycash/mercury-cash-react/build/static/media/preloader.a7cb2a7c.gif",
-    "static/media/qr-logo-small-background.c194ae38.svg": "./modules/mercurycash/mercury-cash-react/build/static/media/qr-logo-small-background.c194ae38.svg"
+    "main.css": "./mercurycash/mercury-cash-react/build/static/css/main.0671e770.css",
+    "main.js": "./mercurycash/mercury-cash-react/build/static/js/main.1fb61edb.js",
+    "main.js.map": "./mercurycash/mercury-cash-react/build/static/js/main.1fb61edb.js.map",
+    "index.html": "./mercurycash/mercury-cash-react/build/index.html",
+    "static/css/main.0671e770.css.map": "./mercurycash/mercury-cash-react/build/static/css/main.0671e770.css.map",
+    "static/js/main.1fb61edb.js.LICENSE.txt": "./mercurycash/mercury-cash-react/build/static/js/main.1fb61edb.js.LICENSE.txt",
+    "static/media/done.97c0edd9.png": "./mercurycash/mercury-cash-react/build/static/media/done.97c0edd9.png",
+    "static/media/icon-back-arrow.16d09450.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-back-arrow.16d09450.svg",
+    "static/media/icon-btc-hover.73daedbb.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-btc-hover.73daedbb.svg",
+    "static/media/icon-btc.a3c59e5d.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-btc.a3c59e5d.svg",
+    "static/media/icon-close.714896e2.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-close.714896e2.svg",
+    "static/media/icon-copy.905df0cc.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-copy.905df0cc.svg",
+    "static/media/icon-dash-hover.b67dcaf6.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-dash-hover.b67dcaf6.svg",
+    "static/media/icon-dash.142147ab.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-dash.142147ab.svg",
+    "static/media/icon-eth-hover.cc9ef334.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-eth-hover.cc9ef334.svg",
+    "static/media/icon-eth.a0d321c0.svg": "./mercurycash/mercury-cash-react/build/static/media/icon-eth.a0d321c0.svg",
+    "static/media/logo-with-text.396c0876.svg": "./mercurycash/mercury-cash-react/build/static/media/logo-with-text.396c0876.svg",
+    "static/media/logo.101326de.svg": "./mercurycash/mercury-cash-react/build/static/media/logo.101326de.svg",
+    "static/media/preloader.a7cb2a7c.gif": "./mercurycash/mercury-cash-react/build/static/media/preloader.a7cb2a7c.gif",
+    "static/media/qr-logo-small-background.c194ae38.svg": "./mercurycash/mercury-cash-react/build/static/media/qr-logo-small-background.c194ae38.svg"
   },
   "entrypoints": [
-    "static/css/main.d17b8e8c.css",
-    "static/js/main.b6c7872e.js"
+    "static/css/main.0671e770.css",
+    "static/js/main.1fb61edb.js"
   ]
 }
